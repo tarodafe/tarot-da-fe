@@ -11,7 +11,29 @@ for(const n of ['Ás','Dois','Três','Quatro','Cinco','Seis','Sete','Oito','Nove
 const cards=[...major,...minor];
 
 const meanings={
-'O Louco':'novos começos, liberdade e coragem para experimentar','O Mago':'iniciativa, habilidade e poder de transformar intenção em ação','A Sacerdotisa':'intuição, silêncio e algo que ainda precisa ser percebido','A Imperatriz':'crescimento, afeto, criatividade e abundância','O Imperador':'estrutura, limites, estabilidade e responsabilidade','O Hierofante':'valores, aprendizado, tradição e orientação','Os Enamorados':'escolhas, vínculos e alinhamento entre coração e valores','O Carro':'movimento, determinação e domínio da própria direção','A Justiça':'equilíbrio, verdade, consequências e decisões conscientes','O Eremita':'introspecção, prudência e busca de respostas internas','A Roda da Fortuna':'mudanças de ciclo, movimento e acontecimentos que alteram o cenário','A Força':'coragem serena, autocontrole e firmeza emocional','O Enforcado':'pausa, nova perspectiva e necessidade de soltar o controle','A Morte':'fim de ciclo, desapego e transformação necessária','A Temperança':'equilíbrio, cura, conciliação e tempo de maturação','O Diabo':'apegos, desejos intensos, padrões repetitivos e necessidade de consciência','A Torre':'ruptura, verdade repentina e reconstrução','A Estrela':'esperança, cura e confiança no caminho','A Lua':'incertezas, emoções profundas e necessidade de observar além das aparências','O Sol':'clareza, vitalidade, alegria e tendência favorável','O Julgamento':'despertar, avaliação, chamado e decisão importante','O Mundo':'conclusão, realização e passagem para uma nova etapa'};
+'O Louco':'novos começos, liberdade e coragem para experimentar',
+'O Mago':'iniciativa, habilidade e poder de transformar intenção em ação',
+'A Sacerdotisa':'intuição, silêncio e algo que ainda precisa ser percebido',
+'A Imperatriz':'crescimento, afeto, criatividade e abundância',
+'O Imperador':'estrutura, limites, estabilidade e responsabilidade',
+'O Hierofante':'valores, aprendizado, tradição e orientação',
+'Os Enamorados':'escolhas, vínculos e alinhamento entre coração e valores',
+'O Carro':'movimento, determinação e domínio da própria direção',
+'A Justiça':'equilíbrio, verdade, consequências e decisões conscientes',
+'O Eremita':'introspecção, prudência e busca de respostas internas',
+'A Roda da Fortuna':'mudanças de ciclo, movimento e acontecimentos que alteram o cenário',
+'A Força':'coragem serena, autocontrole e firmeza emocional',
+'O Enforcado':'pausa, nova perspectiva e necessidade de soltar o controle',
+'A Morte':'fim de ciclo, desapego e transformação necessária',
+'A Temperança':'equilíbrio, cura, conciliação e tempo de maturação',
+'O Diabo':'apegos, desejos intensos, padrões repetitivos e necessidade de consciência',
+'A Torre':'ruptura, verdade repentina e reconstrução',
+'A Estrela':'esperança, cura e confiança no caminho',
+'A Lua':'incertezas, emoções profundas e necessidade de observar além das aparências',
+'O Sol':'clareza, vitalidade, alegria e tendência favorável',
+'O Julgamento':'despertar, avaliação, chamado e decisão importante',
+'O Mundo':'conclusão, realização e passagem para uma nova etapa'
+};
 
 function meaning(c){
  if(meanings[c]) return meanings[c];
@@ -35,21 +57,67 @@ function cardText(c){
 function interpretation(draw,q){
   const chosen=draw.filter(c=>c?.name);
   if(!chosen.length) return null;
+
+  const pergunta=(q||'').toLowerCase();
+  let area='geral';
+  if(/emprego|trabalho|vaga|carreira|profissional|empresa|entrevista/.test(pergunta)) area='trabalho';
+  else if(/amor|relacionamento|namoro|marido|esposa|ex|voltar|sentimento|gosta de mim/.test(pergunta)) area='amor';
+  else if(/dinheiro|financeiro|finanças|dívida|prosperidade|renda/.test(pergunta)) area='dinheiro';
+  else if(/família|familia|filho|filha|mãe|mae|pai|irmão|irmao/.test(pergunta)) area='familia';
+
+  const positivos=['O Sol','A Estrela','O Mundo','O Mago','A Imperatriz','O Carro','A Força','A Temperança','O Julgamento'];
+  const desafiadores=['A Torre','O Diabo','A Lua','O Enforcado','A Morte','Sete de Espadas','Cinco de Espadas','Dez de Espadas'];
+
+  let pontos=0;
+  chosen.forEach(c=>{
+    let valor=positivos.includes(c.name)?2:desafiadores.includes(c.name)?-2:0;
+    if(c.name.includes('Ouros') && (area==='trabalho'||area==='dinheiro')) valor+=1;
+    if(c.name.includes('Copas') && area==='amor') valor+=1;
+    if(c.rev) valor-=1;
+    pontos+=valor;
+  });
+
   const majors=chosen.filter(c=>major.includes(c.name)).length;
-  const suits=['Copas','Paus','Espadas','Ouros'].map(s=>({s,n:chosen.filter(c=>c.name.includes(s)).length})).sort((a,b)=>b.n-a.n);
-  const dominant=suits[0].n>=2?suits[0].s:null;
   const inverted=chosen.filter(c=>c.rev).length;
-  let opening=q?`Para a pergunta “${q}”, `:'Nesta leitura, ';
-  let pattern='';
-  if(majors>=2) pattern+='há uma presença forte de Arcanos Maiores, indicando um tema importante de aprendizado ou mudança de ciclo. ';
-  if(dominant==='Copas') pattern+='As Copas reforçam que sentimentos e relações têm grande peso na situação. ';
-  if(dominant==='Paus') pattern+='Os Paus mostram forte impulso para agir, criar ou movimentar a situação. ';
-  if(dominant==='Espadas') pattern+='As Espadas destacam pensamentos, conversas e decisões que precisam de clareza. ';
-  if(dominant==='Ouros') pattern+='Os Ouros colocam foco em estabilidade, trabalho, dinheiro ou segurança prática. ';
-  if(inverted>=2) pattern+='As cartas invertidas sugerem que parte da energia está travada ou precisa ser trabalhada internamente antes de avançar. ';
-  const sequence=chosen.map((c,i)=>`${layouts[draw.length]?.[i]||`Carta ${i+1}`}: ${c.name}${c.rev?' invertida':''} fala de ${cardText(c)}`).join(' ');
+  let opening=q?`Para a pergunta “${q}”, `:'Nesta tiragem, ';
+
+  let answer='';
+  if(area==='trabalho'){
+    if(pontos>=2) answer='a tendência é favorável para oportunidades profissionais, embora suas escolhas e sua atitude tenham papel importante no resultado. ';
+    else if(pontos<=-2) answer='o caminho profissional ainda apresenta obstáculos ou atrasos, mas a situação não aparece como definitivamente fechada. ';
+    else answer='há possibilidade de movimento na vida profissional, mas o resultado ainda depende de preparação, decisões e das oportunidades que surgirem. ';
+  }else if(area==='amor'){
+    if(pontos>=2) answer='a energia afetiva é favorável à aproximação, entendimento ou evolução, desde que exista reciprocidade. ';
+    else if(pontos<=-2) answer='há bloqueios emocionais ou padrões que precisam ser compreendidos antes de esperar uma evolução afetiva. ';
+    else answer='a situação afetiva permanece aberta e pede clareza sobre sentimentos, limites e expectativas. ';
+  }else if(area==='dinheiro'){
+    if(pontos>=2) answer='as cartas mostram potencial de melhora material, especialmente com organização e decisões práticas. ';
+    else if(pontos<=-2) answer='o momento pede cautela financeira e revisão de escolhas antes de assumir novos compromissos. ';
+    else answer='a situação financeira pode mudar, mas exige planejamento e atenção às oportunidades reais. ';
+  }else{
+    if(pontos>=2) answer='a leitura apresenta uma tendência construtiva e possibilidade de avanço. ';
+    else if(pontos<=-2) answer='a leitura mostra desafios que precisam ser compreendidos antes que a situação avance. ';
+    else answer='a situação ainda está em desenvolvimento e as escolhas feitas agora terão bastante influência no resultado. ';
+  }
+
+  let pattern=answer;
+  if(majors>=2) pattern+='A presença de vários Arcanos Maiores mostra que este assunto representa uma fase importante de aprendizado ou mudança. ';
+  if(inverted>=2) pattern+='Como há várias cartas invertidas, existem bloqueios, inseguranças ou questões internas interferindo no caminho. ';
+
+  const sequence=chosen.map((c,i)=>{
+    const pos=layouts[draw.length]?.[i]||`Carta ${i+1}`;
+    const orientacao=c.rev?'invertida':'em pé';
+    return `${pos} — ${c.name} (${orientacao}): ${cardText(c)}.`;
+  }).join(' ');
+
   const last=chosen[chosen.length-1];
-  const conclusion=`Como direção final, ${last.name}${last.rev?' invertida':''} pede atenção especial a ${cardText(last)}. A melhor leitura é observar como essa mensagem aparece na sua realidade e usar o Tarot como orientação para escolhas conscientes.`;
+  let conclusion='';
+  if(area==='trabalho'){
+    conclusion=`Como direção final, ${last.name}${last.rev?' invertida':''} destaca ${cardText(last)}. Em resumo, ${pontos>=2?'há boas possibilidades de avanço e vale continuar buscando oportunidades':pontos<=-2?'pode haver demora ou necessidade de mudar a estratégia antes do resultado desejado':'o cenário está aberto e suas próximas decisões podem mudar bastante o resultado'}.`;
+  }else{
+    conclusion=`Como direção final, ${last.name}${last.rev?' invertida':''} destaca ${cardText(last)}. O Tarot mostra tendências e caminhos possíveis, não um destino imutável.`;
+  }
+
   return {opening,pattern,sequence,conclusion};
 }
 
@@ -61,9 +129,17 @@ function App(){
  const result=useMemo(()=>interpretation(draw,q),[draw,q]);
 
  function setLayout(n){setCount(n);setDraw(Array.from({length:n},()=>({name:'',rev:false})));}
- function jogar(){let pool=[...cards],out=[];for(let i=0;i<count;i++){let x=Math.floor(Math.random()*pool.length);out.push({name:pool.splice(x,1)[0],rev:Math.random()<.28})}setDraw(out)}
+ function jogar(){
+   let pool=[...cards],out=[];
+   for(let i=0;i<count;i++){
+     let x=Math.floor(Math.random()*pool.length);
+     out.push({name:pool.splice(x,1)[0],rev:Math.random()<.28})
+   }
+   setDraw(out)
+ }
  function updateCard(i,key,value){setDraw(d=>d.map((c,idx)=>idx===i?{...c,[key]:value}:c))}
  function limpar(){setQ('');setDraw(Array.from({length:count},()=>({name:'',rev:false})));}
+
  const complete=draw.every(c=>c.name);
 
  return <main>
@@ -76,11 +152,9 @@ function App(){
    <label>Sua pergunta</label>
    <textarea value={q} onChange={e=>setQ(e.target.value)} placeholder="Ex.: O que preciso entender sobre meu relacionamento neste momento?"/>
    <div className="layoutRow"><span>Quantidade de cartas:</span>{[1,3,5].map(n=><button key={n} className={count===n?'mini activeMini':'mini'} onClick={()=>setLayout(n)}>{n}</button>)}</div>
-
    {mode==='auto' && <button className="primary" onClick={jogar}><Shuffle size={18}/> Jogar {count} {count===1?'carta':'cartas'}</button>}
 
    {mode==='manual' && <div className="manualIntro"><CheckCircle2 size={19}/><span>Faça a tiragem com seu baralho físico e informe abaixo exatamente quais cartas saíram.</span></div>}
-
    <div className="cards">
     {draw.map((c,i)=><article className="card" key={i}>
       <div className="symbol">✦</div>
@@ -91,7 +165,10 @@ function App(){
           <optgroup label="Arcanos Maiores">{major.map(x=><option key={x}>{x}</option>)}</optgroup>
           <optgroup label="Arcanos Menores">{minor.map(x=><option key={x}>{x}</option>)}</optgroup>
         </select>
-        <div className="orientation"><button className={!c.rev?'choice selected':''} onClick={()=>updateCard(i,'rev',false)}>Em pé</button><button className={c.rev?'choice selected':''} onClick={()=>updateCard(i,'rev',true)}>Invertida</button></div>
+        <div className="orientation">
+          <button className={!c.rev?'choice selected':''} onClick={()=>updateCard(i,'rev',false)}>Em pé</button>
+          <button className={c.rev?'choice selected':''} onClick={()=>updateCard(i,'rev',true)}>Invertida</button>
+        </div>
       </>:<><h3>{c.name||'Carta ainda não tirada'}</h3>{c.name&&<><em>{c.rev?'Invertida':'Em pé'}</em><p>{cardText(c)}.</p></>}</>}
     </article>)}
    </div>
@@ -102,10 +179,16 @@ function App(){
     <p>{result.sequence}</p>
     <p>{result.conclusion}</p>
    </div>}
+
    {!complete&&mode==='manual'&&<p className="hint">Selecione todas as cartas para o app gerar a interpretação.</p>}
-   <div className="actions">{mode==='auto'&&draw.some(c=>c.name)&&<button className="again" onClick={jogar}><RotateCcw size={17}/> Jogar novamente</button>}<button className="again" onClick={limpar}>Limpar leitura</button></div>
+
+   <div className="actions">
+     {mode==='auto'&&draw.some(c=>c.name)&&<button className="again" onClick={jogar}><RotateCcw size={17}/> Jogar novamente</button>}
+     <button className="again" onClick={limpar}>Limpar leitura</button>
+   </div>
   </section>
   <footer>Tarot da Fê • leitura simbólica e intuitiva</footer>
  </main>
 }
+
 createRoot(document.getElementById('root')).render(<App/>);
