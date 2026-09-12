@@ -84,31 +84,42 @@ function tendency(score){
 
 function directAnswer(area,score){
   if(area==='Trabalho / Emprego'){
-    if(score>=4) return 'Sim, a tendência é favorável para surgir ou se concretizar uma oportunidade profissional.';
-    if(score>=1) return 'Pode acontecer, mas depende de iniciativa, procura ativa e abertura para oportunidades diferentes.';
-    if(score<=-4) return 'Neste momento, a tendência não é imediata; existem obstáculos ou atrasos importantes antes da concretização.';
-    if(score<=-1) return 'Ainda não aparece como algo próximo; antes, será preciso ajustar estratégia, direção ou expectativas.';
-    return 'A possibilidade existe, mas o cenário ainda está aberto e suas próximas ações terão bastante peso.';
+    if(score>=4) return 'Sim, a tendência é favorável para uma nova oportunidade profissional. As cartas mostram abertura de caminho e possibilidade real de avanço, mas ainda assim sua iniciativa terá papel importante.';
+    if(score>=1) return 'Pode acontecer, mas não parece totalmente imediato. A leitura mostra possibilidade de trabalho, desde que você continue se movimentando, procurando oportunidades e esteja aberta a caminhos diferentes do esperado.';
+    if(score<=-4) return 'Neste momento, a tendência não aponta para uma contratação rápida. Há obstáculos, atrasos ou necessidade de reorganizar a direção profissional antes que uma oportunidade mais concreta apareça.';
+    if(score<=-1) return 'Ainda não aparece como algo próximo, mas também não é uma negativa definitiva. Primeiro será preciso ajustar estratégia, expectativas ou direção antes que o caminho profissional se abra melhor.';
+    return 'Existe possibilidade de conseguir um emprego, mas o cenário ainda está aberto. Suas próximas escolhas, atitudes e a forma como você se movimenta profissionalmente terão bastante influência no resultado.';
   }
+
   if(area==='Dinheiro / Negócios'){
-    if(score>=4) return 'Sim, há boa tendência de retorno financeiro, especialmente com constância e organização.';
-    if(score>=1) return 'Há potencial de ganho, mas ele tende a crescer aos poucos e depende de estratégia e continuidade.';
-    if(score<=-4) return 'Neste momento, há riscos ou bloqueios que pedem cautela antes de esperar retorno financeiro.';
-    if(score<=-1) return 'Ainda não aparece um fluxo financeiro forte; vale revisar preço, estratégia, divulgação ou gastos.';
-    return 'O potencial existe, mas o resultado ainda depende bastante de organização e ação prática.';
+    if(score>=4) return 'Sim, a tendência financeira é favorável. As cartas mostram potencial de crescimento e retorno, especialmente se houver organização, constância e boas decisões.';
+    if(score>=1) return 'Há potencial de ganho, mas ele tende a crescer gradualmente. O resultado depende de estratégia, divulgação, continuidade e atenção às oportunidades que surgirem.';
+    if(score<=-4) return 'Neste momento, a leitura pede cautela com dinheiro ou negócios. Há bloqueios ou riscos que precisam ser administrados antes de esperar um retorno mais forte.';
+    if(score<=-1) return 'Ainda não aparece um fluxo financeiro forte. Antes de esperar crescimento, vale rever preços, gastos, estratégia, divulgação ou forma de atuação.';
+    return 'O potencial financeiro existe, mas o resultado ainda está em construção. Organização, planejamento e constância serão decisivos.';
   }
+
   if(area==='Amor / Relacionamento'){
-    if(score>=4) return 'Sim, a tendência afetiva é favorável, desde que exista reciprocidade.';
-    if(score>=1) return 'Pode acontecer, mas depende de atitude, clareza e participação dos dois lados.';
-    if(score<=-4) return 'Neste momento, há bloqueios fortes ou desgaste que dificultam a evolução da relação.';
-    if(score<=-1) return 'Ainda não é um cenário firme; é melhor observar atitudes concretas antes de criar expectativas.';
-    return 'A situação continua aberta e depende de escolhas, conversas e reciprocidade.';
+    if(score>=4) return 'Sim, a tendência afetiva é favorável, desde que exista reciprocidade. As cartas mostram potencial de aproximação, entendimento ou evolução do vínculo.';
+    if(score>=1) return 'Pode acontecer, mas depende de atitude, clareza e participação dos dois lados. Há potencial, porém não basta sentimento sem movimento concreto.';
+    if(score<=-4) return 'Neste momento, há bloqueios emocionais importantes ou desgaste que dificultam a evolução da relação. A tendência é de pausa ou necessidade de mudança antes de avançar.';
+    if(score<=-1) return 'Ainda não aparece como uma situação firme. É melhor observar atitudes concretas, comunicação e limites antes de criar expectativas maiores.';
+    return 'A situação afetiva continua aberta. O resultado depende de escolhas, conversas sinceras e reciprocidade.';
   }
-  if(score>=4) return 'A tendência geral é favorável.';
-  if(score>=1) return 'Pode acontecer, mas depende de movimento e escolhas.';
-  if(score<=-4) return 'Há obstáculos importantes antes do avanço.';
-  if(score<=-1) return 'Ainda não; há bloqueios que precisam ser trabalhados primeiro.';
-  return 'O cenário está aberto e ainda pode mudar.';
+
+  if(area==='Família'){
+    if(score>=4) return 'A tendência é favorável para entendimento, aproximação ou resolução de questões familiares.';
+    if(score>=1) return 'Há possibilidade de melhora, mas será importante ter paciência, diálogo e disposição para ajustar expectativas.';
+    if(score<=-4) return 'Existem tensões ou bloqueios familiares importantes neste momento, e a situação pede cautela antes de esperar uma solução rápida.';
+    if(score<=-1) return 'Ainda há questões mal resolvidas que precisam ser compreendidas antes de uma melhora mais clara.';
+    return 'O cenário familiar está aberto e pode melhorar conforme houver diálogo, limites e compreensão.';
+  }
+
+  if(score>=4) return 'A tendência geral é favorável e existe possibilidade clara de avanço.';
+  if(score>=1) return 'Pode acontecer, mas depende de movimento, escolhas e aproveitamento das oportunidades.';
+  if(score<=-4) return 'Há obstáculos importantes no momento e será preciso atravessar essa fase antes de esperar avanço.';
+  if(score<=-1) return 'Ainda não. Existem bloqueios ou questões que precisam ser trabalhadas primeiro.';
+  return 'O cenário está aberto e ainda pode mudar conforme suas próximas escolhas.';
 }
 
 function comboNarrative(chosen){
