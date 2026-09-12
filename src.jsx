@@ -58,14 +58,26 @@ function cardText(c){
 
 function detectArea(q){
   const p=(q||'').toLowerCase();
-
   if(/reconcilia|voltar com|volta comigo|ex\b|reatar|reaproxima/.test(p)) return 'Reconciliação';
   if(/emprego|trabalho|vaga|carreira|profissional|empresa|entrevista|serviço|servico/.test(p)) return 'Trabalho / Emprego';
   if(/dinheiro|financeiro|finanças|divida|dívida|prosperidade|renda|lucro|ganhar dinheiro|vender|vendas|cliente|negócio|negocio/.test(p)) return 'Dinheiro / Negócios';
   if(/amor|relacionamento|namoro|marido|esposa|sentimento|gosta de mim|ficar junto/.test(p)) return 'Amor / Relacionamento';
   if(/família|familia|filho|filha|mãe|mae|pai|irmão|irmao/.test(p)) return 'Família';
-
   return 'Geral';
+}
+
+function detectIntent(q){
+  const p=(q||'').toLowerCase();
+
+  if(/vai me procurar|me procura|vai mandar mensagem|vai falar comigo|entra em contato|contato/.test(p)) return 'contato';
+  if(/voltar|reconciliar|reatar|ficar junto novamente/.test(p)) return 'reconciliacao';
+  if(/vou conseguir|consigo|conseguir emprego|arrumar emprego|ser contratad|vaga/.test(p)) return 'conquista';
+  if(/vai melhorar|melhora|ficar melhor/.test(p)) return 'melhora';
+  if(/ganhar dinheiro|dar dinheiro|ter lucro|vai vender|vou vender|prosperar/.test(p)) return 'resultado_financeiro';
+  if(/o que sente|sentimento|gosta de mim|me ama|ama ainda/.test(p)) return 'sentimentos';
+  if(/quando|em quanto tempo|demora/.test(p)) return 'tempo';
+  if(/devo|vale a pena|qual caminho|o que fazer|como agir/.test(p)) return 'decisao';
+  return 'geral';
 }
 
 function scoreCard(c,area){
@@ -90,7 +102,31 @@ function tendency(score){
   return 'Cenário aberto';
 }
 
-function directAnswer(area,score){
+function directAnswer(area,score,intent){
+  if(intent==='contato'){
+    if(score>=4) return 'Sim, há boa tendência de contato ou aproximação.';
+    if(score>=1) return 'Pode haver contato, mas ele não parece imediato nem totalmente espontâneo.';
+    if(score<=-4) return 'Neste momento, o contato parece bloqueado ou pouco provável.';
+    if(score<=-1) return 'Ainda não aparece uma procura próxima; há resistência ou distância antes disso.';
+    return 'Existe possibilidade de contato, mas o cenário ainda está indefinido.';
+  }
+
+  if(intent==='sentimentos'){
+    if(score>=4) return 'Há sentimentos presentes e uma tendência de abertura emocional.';
+    if(score>=1) return 'Há sentimento, mas ele parece misturado com dúvidas, receios ou falta de atitude.';
+    if(score<=-4) return 'A leitura mostra bloqueio emocional, desgaste ou dificuldade de entrega.';
+    if(score<=-1) return 'Os sentimentos não aparecem de forma livre ou clara neste momento.';
+    return 'Há emoção envolvida, mas ainda sem definição suficiente para afirmar uma direção.';
+  }
+
+  if(intent==='reconciliacao' || area==='Reconciliação'){
+    if(score>=4) return 'Há uma tendência favorável para reaproximação ou reconciliação.';
+    if(score>=1) return 'A reconciliação é possível, mas depende de diálogo, atitude e mudança de padrões.';
+    if(score<=-4) return 'Neste momento, a reconciliação encontra obstáculos fortes e não parece próxima.';
+    if(score<=-1) return 'Ainda não. Existe assunto em aberto, mas antes é preciso resolver bloqueios e mágoas.';
+    return 'A reconciliação não está descartada, mas o cenário permanece indefinido.';
+  }
+
   if(area==='Trabalho / Emprego'){
     if(score>=4) return 'Sim, a tendência é favorável para uma nova oportunidade profissional.';
     if(score>=1) return 'Pode acontecer, mas não parece totalmente imediato.';
@@ -115,14 +151,6 @@ function directAnswer(area,score){
     return 'A situação afetiva continua aberta.';
   }
 
-  if(area==='Reconciliação'){
-    if(score>=4) return 'Há uma tendência favorável para reaproximação ou reconciliação.';
-    if(score>=1) return 'A reconciliação é possível, mas depende de diálogo, atitude e mudança de padrões.';
-    if(score<=-4) return 'Neste momento, a reconciliação encontra obstáculos fortes e não parece próxima.';
-    if(score<=-1) return 'Ainda não. Existe vínculo ou assunto em aberto, mas antes é preciso resolver bloqueios e mágoas.';
-    return 'A reconciliação não está descartada, mas o cenário permanece indefinido.';
-  }
-
   if(area==='Família'){
     if(score>=4) return 'A tendência é favorável para entendimento, aproximação ou resolução de questões familiares.';
     if(score>=1) return 'Há possibilidade de melhora, mas será importante ter paciência e diálogo.';
@@ -143,13 +171,13 @@ function comboNarrative(chosen){
   const lines=[];
 
   if(names.some(n=>['A Roda da Fortuna','A Morte','A Torre','O Julgamento'].includes(n)))
-    lines.push('A combinação mostra mudança de fase: algo precisa se transformar para abrir espaço para o próximo passo.');
+    lines.push('A combinação mostra mudança de fase e indica que algo precisa se transformar para abrir espaço para o próximo passo.');
 
   if(names.some(n=>['A Temperança','O Enforcado','O Eremita'].includes(n)))
-    lines.push('Há também uma mensagem de tempo e maturação; nem tudo deve ser forçado agora.');
+    lines.push('Também existe uma mensagem de tempo e maturação: nem tudo deve ser forçado agora.');
 
   if(names.some(n=>['O Mago','O Carro','A Força','Pajem de Paus','Cavaleiro de Paus'].includes(n)))
-    lines.push('Ao mesmo tempo, existe energia de ação e iniciativa, indicando que sua postura pode acelerar o movimento.');
+    lines.push('Há energia de ação e iniciativa, mostrando que sua postura pode acelerar o movimento.');
 
   if(names.includes('Os Enamorados'))
     lines.push('Uma escolha importante aparece no caminho e pode mudar diretamente o resultado.');
@@ -171,74 +199,95 @@ function adviceFromLast(last,area){
   const base=meaning(last.name);
 
   if(area==='Trabalho / Emprego')
-    return `O conselho é agir de forma prática no trabalho: ${base}. Use essa energia para decidir seus próximos passos profissionais.`;
+    return `No trabalho, ${last.name} aconselha ${base}. Transforme essa mensagem em atitude prática nos próximos passos profissionais.`;
 
   if(area==='Dinheiro / Negócios')
-    return `O conselho é aplicar ${base} às suas decisões financeiras e ao modo como você conduz seus projetos ou vendas.`;
+    return `${last.name} aconselha aplicar ${base} às decisões financeiras, vendas ou projetos, evitando agir apenas por ansiedade.`;
 
   if(area==='Amor / Relacionamento')
-    return `O conselho é observar como ${base} aparece no vínculo. Priorize atitudes concretas, limites e reciprocidade.`;
+    return `${last.name} pede atenção a ${base}. Observe atitudes concretas, limites e reciprocidade no vínculo.`;
 
   if(area==='Reconciliação')
-    return `O conselho é não forçar a reconciliação. Observe como ${base} pode ajudar a entender se existe espaço real para uma reaproximação saudável.`;
+    return `${last.name} aconselha observar ${base} antes de tentar forçar uma reaproximação.`;
 
   if(area==='Família')
-    return `O conselho é levar ${base} para as relações familiares, preservando diálogo e limites.`;
+    return `${last.name} indica que ${base} pode ser o ponto mais importante para lidar com essa situação familiar.`;
 
-  return `O conselho principal das cartas é observar ${base} antes de tomar sua próxima decisão.`;
+  return `${last.name} reforça como conselho principal: ${base}.`;
 }
 
-function naturalSummary(area,score,chosen){
-  const answer=directAnswer(area,score);
-  const last=chosen[chosen.length-1];
+function questionSpecificClose(area,intent,score){
+  if(intent==='contato'){
+    if(score>=1) return 'Se houver procura, ela tende a acontecer quando a situação ganhar mais movimento; evite tentar controlar o tempo da outra pessoa.';
+    if(score<=-1) return 'A leitura aconselha não basear suas decisões na expectativa de uma mensagem ou procura imediata.';
+    return 'O contato ainda depende de fatores que não estão totalmente definidos.';
+  }
 
-  let extra='';
+  if(intent==='sentimentos'){
+    if(score>=1) return 'Existe emoção, mas o que realmente importa agora é verificar se ela se transforma em atitude.';
+    if(score<=-1) return 'Mesmo que exista algum sentimento, ele não aparece com força suficiente para sustentar uma conclusão positiva neste momento.';
+    return 'O sentimento pode existir, mas ainda não está claro o bastante para definir o rumo do vínculo.';
+  }
+
+  if(intent==='tempo'){
+    return 'O Tarot não determina datas exatas; aqui a leitura fala mais sobre ritmo, bloqueios e condições para o acontecimento.';
+  }
+
+  if(intent==='decisao'){
+    return 'A tiragem sugere usar o conselho das cartas como critério para decidir, sem entregar a decisão final ao Tarot.';
+  }
 
   if(area==='Trabalho / Emprego'){
-    extra=score>=1
-      ?' As cartas favorecem movimento e abertura para oportunidades, mas mostram que a concretização depende também da sua procura, contatos e disposição para considerar caminhos novos.'
-      :score<=-1
-      ?' Isso não significa impossibilidade: a leitura aponta primeiro uma fase de ajuste, preparação ou mudança de estratégia antes de uma oportunidade mais concreta.'
-      :' O resultado ainda não está definido e pode mudar bastante conforme suas próximas atitudes profissionais.';
+    if(score>=1) return 'A tendência melhora quando você amplia contatos, envia currículos, aceita entrevistas e considera oportunidades diferentes do plano inicial.';
+    if(score<=-1) return 'Antes de esperar uma contratação, a leitura sugere rever estratégia, currículo, direção ou tipo de oportunidade buscada.';
+    return 'O resultado profissional ainda pode mudar bastante conforme suas próximas atitudes.';
   }
 
   if(area==='Dinheiro / Negócios'){
-    extra=score>=1
-      ?' O retorno tende a ser construído com constância, divulgação, organização e repetição de boas decisões, não como dinheiro rápido.'
-      :score<=-1
-      ?' Antes de esperar crescimento, vale rever preço, custos, divulgação, planejamento ou forma de atuação.'
-      :' O resultado material ainda está em construção e depende bastante de organização e continuidade.';
+    if(score>=1) return 'O crescimento tende a vir de constância, organização e repetição de boas decisões, mais do que de um ganho rápido.';
+    if(score<=-1) return 'Antes de esperar retorno maior, vale revisar custos, preços, divulgação e estratégia.';
+    return 'O resultado financeiro ainda está em construção.';
   }
 
   if(area==='Amor / Relacionamento'){
-    extra=score>=1
-      ?' Existe potencial, mas a evolução precisa aparecer também nas atitudes e na reciprocidade, não apenas nos sentimentos.'
-      :score<=-1
-      ?' A leitura pede cautela com expectativas e aconselha observar atitudes concretas, comunicação e limites.'
-      :' O vínculo permanece aberto e o próximo passo depende de clareza e participação dos dois lados.';
+    if(score>=1) return 'Há potencial, mas ele precisa aparecer também em atitudes e reciprocidade.';
+    if(score<=-1) return 'A leitura aconselha proteger suas expectativas e observar comportamentos concretos.';
+    return 'O vínculo continua aberto e depende de clareza dos dois lados.';
   }
 
-  if(area==='Reconciliação'){
-    extra=score>=1
-      ?' Há espaço para reaproximação, mas ela só tende a funcionar se houver conversa sincera e mudança do que causou o afastamento.'
-      :score<=-1
-      ?' Antes de uma volta, existem questões emocionais ou padrões que precisam ser resolvidos; forçar contato agora pode repetir o mesmo problema.'
-      :' O vínculo ainda pode ter algo em aberto, mas a leitura não mostra uma definição imediata.';
-  }
+  return 'As cartas mostram tendências, não um destino imutável.';
+}
 
-  if(area==='Família'){
-    extra=score>=1
-      ?' A melhora tende a vir com diálogo, paciência e disposição para rever expectativas.'
-      :score<=-1
-      ?' A leitura pede tempo, limites e cuidado para não ampliar conflitos já existentes.'
-      :' O cenário pode mudar conforme houver mais clareza e comunicação.';
-  }
+function buildSummary(q,area,intent,score,chosen){
+  const names=chosen.map(c=>c.name);
+  const last=chosen[chosen.length-1];
+  const answer=directAnswer(area,score,intent);
+  const close=questionSpecificClose(area,intent,score);
 
-  if(area==='Geral'){
-    extra=' O Tarot mostra tendências e possibilidades, não uma certeza absoluta.';
-  }
+  let link='';
 
-  return `${answer}${extra} A carta de conselho é ${last.name}${last.rev?' invertida':''}.`;
+  if(names.includes('A Roda da Fortuna'))
+    link+=' A Roda da Fortuna acrescenta movimento e mudança de cenário.';
+  if(names.includes('O Enforcado'))
+    link+=' O Enforcado mostra que uma pausa ou mudança de perspectiva ainda pode ser necessária.';
+  if(names.includes('O Sol'))
+    link+=' O Sol fortalece a clareza e o potencial positivo da tiragem.';
+  if(names.includes('A Estrela'))
+    link+=' A Estrela favorece esperança, recuperação e confiança no caminho.';
+  if(names.includes('A Torre'))
+    link+=' A Torre indica que algo precisa ser rompido ou reorganizado antes de seguir.';
+  if(names.includes('O Diabo'))
+    link+=' O Diabo alerta para apego, ansiedade ou padrões repetitivos que podem interferir.';
+  if(names.includes('A Imperatriz'))
+    link+=' A Imperatriz favorece crescimento, criatividade e expansão.';
+  if(names.includes('O Imperador'))
+    link+=' O Imperador pede estrutura, limites e decisões práticas.';
+  if(names.includes('O Carro'))
+    link+=' O Carro reforça movimento, iniciativa e direção.';
+  if(names.includes('Os Enamorados'))
+    link+=' Os Enamorados mostram que uma escolha ou alinhamento de valores será decisivo.';
+
+  return `${answer}${link} ${close} Como carta final, ${last.name}${last.rev?' invertida':' em pé'} reforça ${meaning(last.name)}.`;
 }
 
 function interpretation(draw,q){
@@ -246,50 +295,30 @@ function interpretation(draw,q){
   if(!chosen.length) return null;
 
   const area=detectArea(q);
+  const intent=detectIntent(q);
   const score=chosen.reduce((a,c)=>a+scoreCard(c,area),0);
   const label=tendency(score);
-  const answer=directAnswer(area,score);
+  const answer=directAnswer(area,score,intent);
 
   const sequence=chosen.map((c,i)=>{
-    const pos=layouts[draw.length]?.[i] || `Carta ${i+1}`;
+    const pos=layouts[draw.length]?.[i]||`Carta ${i+1}`;
     return `${pos} — ${c.name}${c.rev?' (invertida)':' (em pé)'}: ${cardText(c)}.`;
   }).join(' ');
 
   const combination=comboNarrative(chosen);
   const last=chosen[chosen.length-1];
 
-  let abertura='';
-  let fechamento='';
-
-  if(area==='Trabalho / Emprego'){
-    abertura=`As cartas mostram um cenário profissional que precisa ser observado como um processo, e não apenas como um “sim” ou “não”. ${answer}`;
-    fechamento=`O ponto principal desta tiragem é que o resultado profissional ainda pode ser influenciado pelas suas atitudes, escolhas e oportunidades que surgirem daqui para frente.`;
-  }else if(area==='Dinheiro / Negócios'){
-    abertura=`Na área financeira, a tiragem mostra tendências importantes sobre movimento, estabilidade e possibilidades. ${answer}`;
-    fechamento=`As cartas aconselham observar não apenas o resultado imediato, mas também as decisões práticas que podem fortalecer sua situação financeira.`;
-  }else if(area==='Amor / Relacionamento'){
-    abertura=`No campo afetivo, as cartas falam principalmente sobre sentimentos, atitudes e reciprocidade. ${answer}`;
-    fechamento=`Mais do que esperar apenas pelo que a outra pessoa sente, esta tiragem pede atenção às atitudes concretas, à comunicação e à reciprocidade entre vocês.`;
-  }else if(area==='Família'){
-    abertura=`Sobre a situação familiar, as cartas mostram emoções e questões que ainda podem passar por mudanças. ${answer}`;
-    fechamento=`O caminho indicado pelas cartas envolve diálogo, compreensão e limites claros para que a situação possa evoluir de maneira mais equilibrada.`;
-  }else{
-    abertura=`O conjunto das cartas mostra tendências e possibilidades para a sua pergunta. ${answer}`;
-    fechamento=`A leitura não mostra um destino totalmente fechado. As próximas escolhas e acontecimentos ainda podem modificar o rumo dessa situação.`;
-  }
-
-  const resumo=`${abertura} ${combination} ${fechamento} A carta que encerra a leitura é ${last.name}${last.rev?' invertida':' em pé'}, reforçando o conselho final da tiragem.`;
-
   return {
     area,
     label,
-    answer:abertura,
+    answer,
     combination,
     sequence,
     advice:adviceFromLast(last,area),
-    summary:resumo
+    summary:buildSummary(q,area,intent,score,chosen)
   };
 }
+
 function App(){
   const[q,setQ]=useState('');
   const[mode,setMode]=useState('manual');
