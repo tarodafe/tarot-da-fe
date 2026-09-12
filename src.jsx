@@ -251,24 +251,45 @@ function interpretation(draw,q){
   const answer=directAnswer(area,score);
 
   const sequence=chosen.map((c,i)=>{
-    const pos=layouts[draw.length]?.[i]||`Carta ${i+1}`;
-    return `${pos} — ${c.name} (${c.rev?'invertida':'em pé'}): ${cardText(c)}.`;
+    const pos=layouts[draw.length]?.[i] || `Carta ${i+1}`;
+    return `${pos} — ${c.name}${c.rev?' (invertida)':' (em pé)'}: ${cardText(c)}.`;
   }).join(' ');
 
   const combination=comboNarrative(chosen);
   const last=chosen[chosen.length-1];
 
+  let abertura='';
+  let fechamento='';
+
+  if(area==='Trabalho / Emprego'){
+    abertura=`As cartas mostram um cenário profissional que precisa ser observado como um processo, e não apenas como um “sim” ou “não”. ${answer}`;
+    fechamento=`O ponto principal desta tiragem é que o resultado profissional ainda pode ser influenciado pelas suas atitudes, escolhas e oportunidades que surgirem daqui para frente.`;
+  }else if(area==='Dinheiro / Negócios'){
+    abertura=`Na área financeira, a tiragem mostra tendências importantes sobre movimento, estabilidade e possibilidades. ${answer}`;
+    fechamento=`As cartas aconselham observar não apenas o resultado imediato, mas também as decisões práticas que podem fortalecer sua situação financeira.`;
+  }else if(area==='Amor / Relacionamento'){
+    abertura=`No campo afetivo, as cartas falam principalmente sobre sentimentos, atitudes e reciprocidade. ${answer}`;
+    fechamento=`Mais do que esperar apenas pelo que a outra pessoa sente, esta tiragem pede atenção às atitudes concretas, à comunicação e à reciprocidade entre vocês.`;
+  }else if(area==='Família'){
+    abertura=`Sobre a situação familiar, as cartas mostram emoções e questões que ainda podem passar por mudanças. ${answer}`;
+    fechamento=`O caminho indicado pelas cartas envolve diálogo, compreensão e limites claros para que a situação possa evoluir de maneira mais equilibrada.`;
+  }else{
+    abertura=`O conjunto das cartas mostra tendências e possibilidades para a sua pergunta. ${answer}`;
+    fechamento=`A leitura não mostra um destino totalmente fechado. As próximas escolhas e acontecimentos ainda podem modificar o rumo dessa situação.`;
+  }
+
+  const resumo=`${abertura} ${combination} ${fechamento} A carta que encerra a leitura é ${last.name}${last.rev?' invertida':' em pé'}, reforçando o conselho final da tiragem.`;
+
   return {
     area,
     label,
-    answer,
+    answer:abertura,
     combination,
     sequence,
     advice:adviceFromLast(last,area),
-    summary:naturalSummary(area,score,chosen)
+    summary:resumo
   };
 }
-
 function App(){
   const[q,setQ]=useState('');
   const[mode,setMode]=useState('manual');
