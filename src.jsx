@@ -56,25 +56,25 @@ function cardText(c){
 
 function detectArea(q){
   const p=(q||'').toLowerCase();
-  if(/emprego|trabalho|vaga|carreira|profissional|empresa|entrevista|negócio|negocio|vender|vendas|cliente/.test(p)) return 'trabalho';
-  if(/dinheiro|financeiro|finanças|divida|dívida|prosperidade|renda|lucro|ganhar dinheiro/.test(p)) return 'dinheiro';
-  if(/amor|relacionamento|namoro|marido|esposa|ex|voltar|sentimento|gosta de mim|ficar junto|reconcilia/.test(p)) return 'amor';
-  if(/família|familia|filho|filha|mãe|mae|pai|irmão|irmao/.test(p)) return 'familia';
-  return 'geral';
+  if(/emprego|trabalho|vaga|carreira|profissional|empresa|entrevista|serviço|servico/.test(p)) return 'Trabalho / Emprego';
+  if(/dinheiro|financeiro|finanças|divida|dívida|prosperidade|renda|lucro|ganhar dinheiro|vender|vendas|cliente|negócio|negocio/.test(p)) return 'Dinheiro / Negócios';
+  if(/amor|relacionamento|namoro|marido|esposa|ex|voltar|sentimento|gosta de mim|ficar junto|reconcilia/.test(p)) return 'Amor / Relacionamento';
+  if(/família|familia|filho|filha|mãe|mae|pai|irmão|irmao/.test(p)) return 'Família';
+  return 'Geral';
 }
 
-function baseScore(c,area){
-  const positivos=['O Sol','A Estrela','O Mundo','O Mago','A Imperatriz','O Carro','A Força','A Temperança','O Julgamento','Ás de Ouros','Nove de Ouros','Dez de Ouros','Seis de Paus','Três de Copas'];
+function scoreCard(c,area){
+  const positivos=['O Sol','A Estrela','O Mundo','O Mago','A Imperatriz','O Carro','A Força','A Temperança','O Julgamento','Ás de Ouros','Nove de Ouros','Dez de Ouros','Seis de Paus'];
   const desafiadores=['A Torre','O Diabo','A Lua','O Enforcado','A Morte','Sete de Espadas','Cinco de Espadas','Dez de Espadas','Cinco de Ouros'];
   let v=positivos.includes(c.name)?2:desafiadores.includes(c.name)?-2:0;
-  if(area==='trabalho' && (c.name.includes('Ouros')||c.name.includes('Paus'))) v+=1;
-  if(area==='dinheiro' && c.name.includes('Ouros')) v+=1;
-  if(area==='amor' && c.name.includes('Copas')) v+=1;
+  if(area==='Trabalho / Emprego' && (c.name.includes('Ouros')||c.name.includes('Paus'))) v+=1;
+  if(area==='Dinheiro / Negócios' && c.name.includes('Ouros')) v+=1;
+  if(area==='Amor / Relacionamento' && c.name.includes('Copas')) v+=1;
   if(c.rev) v-=1;
   return v;
 }
 
-function tendencyLabel(score){
+function tendency(score){
   if(score>=4) return 'Tendência favorável';
   if(score>=1) return 'Pode acontecer, mas depende de movimento e escolhas';
   if(score<=-4) return 'Há obstáculos importantes no momento';
@@ -82,73 +82,51 @@ function tendencyLabel(score){
   return 'Cenário aberto';
 }
 
-function areaOpening(area,score){
-  if(area==='trabalho'){
-    if(score>=4) return 'As cartas mostram uma tendência positiva para avanço profissional, oportunidade ou crescimento.';
-    if(score>=1) return 'Existe possibilidade de avanço profissional, mas o resultado depende de iniciativa, estratégia e timing.';
-    if(score<=-4) return 'O caminho profissional mostra bloqueios fortes, atrasos ou necessidade de mudar a estratégia antes de avançar.';
-    if(score<=-1) return 'Há alguma trava ou indefinição profissional; antes do avanço, algo precisa ser reorganizado.';
-    return 'O cenário profissional está aberto e ainda pode mudar bastante conforme suas próximas decisões.';
+function directAnswer(area,score){
+  if(area==='Trabalho / Emprego'){
+    if(score>=4) return 'Sim, a tendência é favorável para surgir ou se concretizar uma oportunidade profissional.';
+    if(score>=1) return 'Pode acontecer, mas depende de iniciativa, procura ativa e abertura para oportunidades diferentes.';
+    if(score<=-4) return 'Neste momento, a tendência não é imediata; existem obstáculos ou atrasos importantes antes da concretização.';
+    if(score<=-1) return 'Ainda não aparece como algo próximo; antes, será preciso ajustar estratégia, direção ou expectativas.';
+    return 'A possibilidade existe, mas o cenário ainda está aberto e suas próximas ações terão bastante peso.';
   }
-  if(area==='dinheiro'){
-    if(score>=4) return 'A leitura é favorável para crescimento financeiro, desde que haja constância e decisões práticas.';
-    if(score>=1) return 'Há potencial de ganho, mas ele tende a vir com planejamento, continuidade e aproveitamento de oportunidades reais.';
-    if(score<=-4) return 'O momento pede cautela financeira; a leitura mostra riscos, perdas de energia ou necessidade de reestruturação.';
-    if(score<=-1) return 'O dinheiro pode demorar mais a fluir; é importante rever estratégia, preço, gastos ou forma de atuação.';
-    return 'A situação financeira ainda está em formação e depende muito de organização e escolhas concretas.';
+  if(area==='Dinheiro / Negócios'){
+    if(score>=4) return 'Sim, há boa tendência de retorno financeiro, especialmente com constância e organização.';
+    if(score>=1) return 'Há potencial de ganho, mas ele tende a crescer aos poucos e depende de estratégia e continuidade.';
+    if(score<=-4) return 'Neste momento, há riscos ou bloqueios que pedem cautela antes de esperar retorno financeiro.';
+    if(score<=-1) return 'Ainda não aparece um fluxo financeiro forte; vale revisar preço, estratégia, divulgação ou gastos.';
+    return 'O potencial existe, mas o resultado ainda depende bastante de organização e ação prática.';
   }
-  if(area==='amor'){
-    if(score>=4) return 'A energia afetiva é favorável para aproximação, entendimento ou evolução do vínculo.';
-    if(score>=1) return 'Existe potencial afetivo, mas a relação precisa de clareza, reciprocidade e atitude.';
-    if(score<=-4) return 'Há bloqueios emocionais importantes, desgaste ou padrões que dificultam a evolução neste momento.';
-    if(score<=-1) return 'A situação afetiva ainda não está madura para avançar com segurança; é preciso observar melhor sentimentos e limites.';
-    return 'O cenário afetivo permanece aberto e depende de escolhas e conversas sinceras.';
+  if(area==='Amor / Relacionamento'){
+    if(score>=4) return 'Sim, a tendência afetiva é favorável, desde que exista reciprocidade.';
+    if(score>=1) return 'Pode acontecer, mas depende de atitude, clareza e participação dos dois lados.';
+    if(score<=-4) return 'Neste momento, há bloqueios fortes ou desgaste que dificultam a evolução da relação.';
+    if(score<=-1) return 'Ainda não é um cenário firme; é melhor observar atitudes concretas antes de criar expectativas.';
+    return 'A situação continua aberta e depende de escolhas, conversas e reciprocidade.';
   }
-  if(score>=4) return 'A leitura apresenta uma tendência construtiva e possibilidade clara de avanço.';
-  if(score>=1) return 'Há sinais de avanço, mas ainda existem fatores que dependem das suas escolhas.';
-  if(score<=-4) return 'A leitura mostra obstáculos fortes e necessidade de mudança antes que a situação avance.';
-  if(score<=-1) return 'O momento pede cautela, revisão e paciência antes de esperar um resultado favorável.';
-  return 'A situação está aberta e ainda pode se desenvolver em mais de uma direção.';
+  if(score>=4) return 'A tendência geral é favorável.';
+  if(score>=1) return 'Pode acontecer, mas depende de movimento e escolhas.';
+  if(score<=-4) return 'Há obstáculos importantes antes do avanço.';
+  if(score<=-1) return 'Ainda não; há bloqueios que precisam ser trabalhados primeiro.';
+  return 'O cenário está aberto e ainda pode mudar.';
 }
 
-function comboNarrative(chosen,area){
+function comboNarrative(chosen){
   const names=chosen.map(c=>c.name);
-  const hasChange=names.some(n=>['A Roda da Fortuna','A Morte','A Torre','O Julgamento'].includes(n));
-  const hasPatience=names.some(n=>['A Temperança','O Enforcado','O Eremita'].includes(n));
-  const hasAction=names.some(n=>['O Mago','O Carro','A Força'].includes(n));
-  const hasChoice=names.includes('Os Enamorados');
-  const hasClarity=names.some(n=>['O Sol','A Justiça','A Estrela'].includes(n));
-  const hasFear=names.some(n=>['A Lua','O Diabo','Sete de Espadas'].includes(n));
-
-  let parts=[];
-  if(hasChange) parts.push('A combinação indica mudança de fase: algo precisa se transformar para que o resultado desejado ganhe espaço.');
-  if(hasPatience) parts.push('Ao mesmo tempo, as cartas pedem paciência, maturação e observação do tempo certo, sem forçar o processo.');
-  if(hasAction) parts.push('Também existe energia de ação: quando surgir a oportunidade, será importante agir com iniciativa e firmeza.');
-  if(hasChoice) parts.push('Há uma escolha relevante no caminho, e ela pode alterar diretamente o rumo da situação.');
-  if(hasClarity) parts.push('Há potencial de clareza e melhora quando as decisões forem tomadas de forma consciente.');
-  if(hasFear) parts.push('Medos, dúvidas ou padrões repetitivos podem distorcer a percepção; vale separar receio de fato concreto.');
-
-  if(!parts.length){
-    if(area==='trabalho') parts.push('A combinação sugere que o resultado depende mais de estratégia e constância do que de um acontecimento repentino.');
-    else if(area==='dinheiro') parts.push('A combinação mostra que o resultado material tende a ser construído aos poucos, com escolhas práticas e consistentes.');
-    else if(area==='amor') parts.push('A combinação pede observar reciprocidade, comunicação e coerência entre sentimento e atitude.');
-    else parts.push('As cartas se complementam mostrando que o resultado depende de como você responde aos desafios e oportunidades do momento.');
-  }
-  return parts.join(' ');
-}
-
-function finalSummary(area,score,last){
-  const label=tendencyLabel(score);
-  if(area==='trabalho'){
-    return `${label}. ${score>=1?'Vale continuar se movimentando, se preparando e aproveitando oportunidades concretas.':score<=-1?'Antes do avanço, ajuste sua estratégia e não interprete demora como impossibilidade.':'O resultado ainda está aberto; suas próximas ações terão bastante peso.'} Carta-chave final: ${last.name}.`;
-  }
-  if(area==='dinheiro'){
-    return `${label}. ${score>=1?'Há potencial de retorno, mas o crescimento tende a vir com planejamento, constância e boa gestão.':score<=-1?'Evite pressa e reveja estratégia, custos, preços ou forma de vender antes de esperar crescimento.':'O cenário ainda não está definido; organização e consistência serão decisivas.'} Carta-chave final: ${last.name}.`;
-  }
-  if(area==='amor'){
-    return `${label}. ${score>=1?'A evolução é possível se houver reciprocidade e atitude dos dois lados.':score<=-1?'Não force o vínculo; observe limites, comunicação e sinais concretos antes de criar expectativas.':'A situação continua aberta e depende de escolhas e clareza emocional.'} Carta-chave final: ${last.name}.`;
-  }
-  return `${label}. O Tarot aponta tendências e possibilidades, não uma certeza absoluta. Carta-chave final: ${last.name}.`;
+  const lines=[];
+  if(names.some(n=>['A Roda da Fortuna','A Morte','A Torre','O Julgamento'].includes(n)))
+    lines.push('A combinação mostra mudança de fase: algo precisa se transformar para abrir espaço para o próximo passo.');
+  if(names.some(n=>['A Temperança','O Enforcado','O Eremita'].includes(n)))
+    lines.push('Há também uma mensagem de tempo e maturação; nem tudo deve ser forçado agora.');
+  if(names.some(n=>['O Mago','O Carro','A Força','Pajem de Paus','Cavaleiro de Paus'].includes(n)))
+    lines.push('Ao mesmo tempo, existe energia de ação e iniciativa, indicando que sua postura pode acelerar o movimento.');
+  if(names.includes('Os Enamorados'))
+    lines.push('Uma escolha importante aparece no caminho e pode mudar diretamente o resultado.');
+  if(names.some(n=>['O Sol','A Estrela','A Justiça'].includes(n)))
+    lines.push('Há potencial de clareza e melhora quando as decisões forem tomadas com consciência.');
+  if(names.some(n=>['A Lua','O Diabo','Sete de Espadas'].includes(n)))
+    lines.push('Medos, dúvidas ou padrões repetitivos podem interferir; vale separar receio de fato concreto.');
+  return lines.length?lines.join(' '):'As cartas se complementam mostrando que o resultado depende da forma como você responde aos desafios e oportunidades deste momento.';
 }
 
 function interpretation(draw,q){
@@ -156,28 +134,61 @@ function interpretation(draw,q){
   if(!chosen.length) return null;
 
   const area=detectArea(q);
-  const score=chosen.reduce((acc,c)=>acc+baseScore(c,area),0);
+  const score=chosen.reduce((a,c)=>a+scoreCard(c,area),0);
+  const label=tendency(score);
+  const direct=directAnswer(area,score);
   const majors=chosen.filter(c=>major.includes(c.name)).length;
   const inverted=chosen.filter(c=>c.rev).length;
 
   const opening=q?`Para a pergunta “${q}”, `:'Nesta tiragem, ';
-  let pattern=areaOpening(area,score)+' ';
-  if(majors>=2) pattern+='A presença de vários Arcanos Maiores mostra que este assunto marca uma fase importante de aprendizado ou mudança. ';
-  if(inverted>=2) pattern+='Como há várias cartas invertidas, existem bloqueios, inseguranças ou questões internas interferindo no caminho. ';
-
-  const combination=comboNarrative(chosen,area);
+  let context=direct+' ';
+  if(majors>=2) context+='A presença de vários Arcanos Maiores mostra que o assunto representa uma fase importante de aprendizado ou mudança. ';
+  if(inverted>=2) context+='As cartas invertidas indicam bloqueios, inseguranças ou questões internas interferindo no caminho. ';
 
   const sequence=chosen.map((c,i)=>{
     const pos=layouts[draw.length]?.[i]||`Carta ${i+1}`;
-    const orientacao=c.rev?'invertida':'em pé';
-    return `${pos} — ${c.name} (${orientacao}): ${cardText(c)}.`;
+    return `${pos} — ${c.name} (${c.rev?'invertida':'em pé'}): ${cardText(c)}.`;
   }).join(' ');
 
+  const combination=comboNarrative(chosen);
   const last=chosen[chosen.length-1];
-  const conclusion=`Como direção final, ${last.name}${last.rev?' invertida':''} reforça ${cardText(last)}.`;
-  const summary=finalSummary(area,score,last);
 
-  return {opening,pattern,combination,sequence,conclusion,summary,label:tendencyLabel(score)};
+  let summary=direct;
+  if(area==='Trabalho / Emprego'){
+    summary+=' ';
+    summary+=score>=1
+      ?'A leitura recomenda continuar procurando, conversando com pessoas, enviando currículos e aceitando considerar caminhos novos.'
+      :score<=-1
+      ?'Antes da concretização, vale rever estratégia, ampliar possibilidades e não interpretar demora como impossibilidade.'
+      :'O resultado ainda não está fechado; iniciativa e constância podem alterar bastante o cenário.';
+  }else if(area==='Dinheiro / Negócios'){
+    summary+=' ';
+    summary+=score>=1
+      ?'O crescimento tende a vir mais pela constância, divulgação, organização e repetição de boas ações do que por dinheiro rápido.'
+      :score<=-1
+      ?'É melhor ajustar estratégia, custos, preços ou divulgação antes de esperar um retorno mais forte.'
+      :'O resultado ainda está em construção; planejamento e consistência serão decisivos.';
+  }else if(area==='Amor / Relacionamento'){
+    summary+=' ';
+    summary+=score>=1
+      ?'A evolução é possível, mas precisa aparecer também nas atitudes e na reciprocidade.'
+      :score<=-1
+      ?'Não force o vínculo; observe limites, comunicação e sinais concretos antes de criar expectativas.'
+      :'A situação continua aberta e depende de escolhas e clareza emocional.';
+  }else{
+    summary+=' O Tarot mostra tendências e possibilidades, não uma certeza absoluta.';
+  }
+
+  return {
+    area,
+    label,
+    opening,
+    context,
+    combination,
+    sequence,
+    conclusion:`Como direção final, ${last.name}${last.rev?' invertida':''} reforça ${cardText(last)}.`,
+    summary
+  };
 }
 
 function App(){
@@ -234,14 +245,18 @@ function App(){
 
    {complete&&result&&<div className="reading">
     <h2><Sparkles size={20}/> Interpretação da tiragem</h2>
-    <p><strong>{result.label}</strong></p>
-    <p>{result.opening}{result.pattern}</p>
+    <p><strong>Área identificada:</strong> {result.area}</p>
+    <p><strong>✨ {result.label}</strong></p>
+    <p>{result.opening}{result.context}</p>
+
+    <h3>Leitura em conjunto</h3>
     <p>{result.combination}</p>
+
     <p>{result.sequence}</p>
     <p>{result.conclusion}</p>
 
     <div className="finalSummary">
-      <h3>Resumo final</h3>
+      <h3>⭐ Resumo final</h3>
       <p>{result.summary}</p>
     </div>
    </div>}
